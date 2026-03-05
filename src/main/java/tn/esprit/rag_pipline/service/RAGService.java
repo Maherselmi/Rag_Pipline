@@ -34,7 +34,6 @@ public class RAGService {
         TextSegment segment = TextSegment.from(document.getContent());
         Embedding embedding = embeddingModel.embed(segment.text()).content();
 
-        // Ajouter des métadonnées
         segment.metadata().put("fileName", document.getFileName());
         segment.metadata().put("sinistreId", document.getSinistreId());
         segment.metadata().put("typeDocument", document.getTypeDocument());
@@ -46,25 +45,19 @@ public class RAGService {
     public ReponseRAG answerQuestion(QuestionRequest request) {
         long startTime = System.currentTimeMillis();
 
-        // 1. Embedding de la question
         Embedding questionEmbedding = embeddingModel.embed(request.getQuestion()).content();
 
-        // 2. Recherche des documents pertinents
         int maxResults = request.getMaxResults() > 0 ? request.getMaxResults() : 5;
         List<EmbeddingMatch<TextSegment>> matches = embeddingStore.findRelevant(
                 questionEmbedding, maxResults
         );
 
-        // 3. Construction du contexte
         String context = buildContext(matches);
 
-        // 4. Création du prompt
         String prompt = buildPrompt(request.getQuestion(), context);
 
-        // 5. Génération de la réponse
         AiMessage response = chatLanguageModel.generate(UserMessage.from(prompt)).content();
 
-        // 6. Construction de la réponse
         double executionTime = (System.currentTimeMillis() - startTime) / 1000.0;
 
         return ReponseRAG.builder()

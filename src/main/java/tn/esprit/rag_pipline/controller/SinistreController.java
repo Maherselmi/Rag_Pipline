@@ -43,7 +43,6 @@ public class SinistreController {
 
     @GetMapping("/documents/{sinistreId}")
     public ResponseEntity<List<SinistreDocument>> getDocumentsBySinistre(@PathVariable String sinistreId) {
-        // Implémenter la récupération des documents par sinistre
         return ResponseEntity.ok().build();
     }
 }
